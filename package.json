@@ -1,0 +1,18 @@
+{
+  "name": "expense-split",
+  "version": "0.1.0",
+  "description": "Group expense splitting library.",
+  "homepage": "https://github.com/valeriangalliat/expense-split",
+  "license": "Unlicense",
+  "repository": "valeriangalliat/expense-split",
+  "scripts": {
+    "lint": "standard",
+    "test": "standard && node test"
+  },
+  "devDependencies": {
+    "standard": "^8.4.0"
+  },
+  "engines": {
+    "node": "^6.0.0"
+  }
+}
