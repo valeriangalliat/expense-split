@@ -1,6 +1,6 @@
 {
   "name": "expense-split",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Group expense splitting library.",
   "homepage": "https://github.com/valeriangalliat/expense-split",
   "license": "Unlicense",
