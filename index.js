@@ -30,7 +30,7 @@ const aggregateExpense = (debts, expense) =>
 
 // For a given group and expenses list, aggregate the balance of each
 // group member.
-const aggregateExpenses = group => expenses =>
+const aggregateExpenses = expenses =>
   expenses.reduce(aggregateExpense, {})
 
 // Convert a balances object to a list of users with a name and a
@@ -86,7 +86,7 @@ const doExpenseSplit = members =>
 
 // Get final balances by users (negative if creditor, positive if debtor).
 const getBalances = (group, expenses) =>
-  aggregateExpenses(group)(unifyExpenses(group)(expenses))
+  aggregateExpenses(unifyExpenses(group)(expenses))
 
 const fromBalances = balances =>
   doExpenseSplit(balancesToMembers(balances))
