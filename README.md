@@ -1,4 +1,4 @@
-# Expense split
+# Expense split [![npm version](http://img.shields.io/npm/v/expense-split.svg?style=flat-square)](https://www.npmjs.org/package/expense-split)
 
 > Group expense splitting library.
 
