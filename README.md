@@ -38,3 +38,24 @@ const transactions = expenseSplit(group, [
   ['Franklin', 50, ['Michael', 'Franklin']] // Gas
 ])
 ```
+
+Also comes with a function to get aggregated balances for all users:
+
+```js
+const balances = expenseSplit.getBalances(group, [
+  { name: 'Michael', amount: 7920 }, // Ammu-Nation
+  { name: 'Trevor', amount: 2880 }, // Plane "rental"
+  { name: 'Trevor', amount: 300 }, // Parachutes
+  { name: 'Franklin', amount: 8000, for: ['Michael', 'Franklin'] }, // Sanchez
+  { name: 'Franklin', amount: 50, for: ['Michael', 'Franklin'] } // Gas
+])
+```
+Will output:
+
+```js
+{
+  Michael: -195,
+  Trevor: 520,
+  Franklin: -325
+}
+```

@@ -84,10 +84,16 @@ const doExpenseSplit = members =>
     members.filter(m => m.balance > 0).sort((a, b) => b.balance - a.balance),
     members.filter(m => m.balance < 0).sort((a, b) => a.balance - b.balance))
 
+// Get final balances by users (negative if creditor, positive if debtor).
+const getBalances = (group, expenses) =>
+  aggregateExpenses(group)(unifyExpenses(group)(expenses))
+
 // Main export function, formatting input and auto currying.
 const expenseSplit = (group, expenses) =>
   expenses
-    ? doExpenseSplit(balancesToMembers(aggregateExpenses(group)(unifyExpenses(group)(expenses))))
+    ? doExpenseSplit(balancesToMembers(getBalances(group, expenses)))
     : expenses => expenseSplit(group, expenses)
+
+expenseSplit.getBalances = getBalances
 
 module.exports = expenseSplit
