@@ -50,6 +50,7 @@ const balances = expenseSplit.getBalances(group, [
   { name: 'Franklin', amount: 50, for: ['Michael', 'Franklin'] } // Gas
 ])
 ```
+
 Will output:
 
 ```js
@@ -58,4 +59,10 @@ Will output:
   Trevor: 520,
   Franklin: -325
 }
+```
+
+If you have a balances object, you can also compute the split directly:
+
+```js
+const transactions = expenseSplit.fromBalances(balances)
 ```

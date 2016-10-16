@@ -88,12 +88,16 @@ const doExpenseSplit = members =>
 const getBalances = (group, expenses) =>
   aggregateExpenses(group)(unifyExpenses(group)(expenses))
 
+const fromBalances = balances =>
+  doExpenseSplit(balancesToMembers(balances))
+
 // Main export function, formatting input and auto currying.
 const expenseSplit = (group, expenses) =>
   expenses
-    ? doExpenseSplit(balancesToMembers(getBalances(group, expenses)))
+    ? fromBalances(getBalances(group, expenses))
     : expenses => expenseSplit(group, expenses)
 
 expenseSplit.getBalances = getBalances
+expenseSplit.fromBalances = fromBalances
 
 module.exports = expenseSplit
