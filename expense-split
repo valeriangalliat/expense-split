@@ -1,0 +1,167 @@
+#!/usr/bin/env node
+
+const doc = `
+Usage:
+  expense-split init <split>
+  expense-split group [<name>...]
+  expense-split add <creditor> <amount> <description> [--for=<name>]...
+  expense-split rm <target>
+  expense-split reset
+  expense-split expenses
+  expense-split balances
+  expense-split split
+  expense-split summary
+  expense-split current
+  expense-split list
+`.trim()
+
+const Configstore = require('configstore')
+const { docopt } = require('docopt')
+const { promisify } = require('util')
+const pkg = require('./package')
+const expenseSplit = require('./')
+
+const globalConfig = new Configstore(pkg.name, { splits: {} })
+const currentConfig = globalConfig.get('current') && new Configstore(`${pkg.name}/${globalConfig.get('current')}`, { group: [], expenses: [] })
+const args = docopt(doc, { version: pkg.version })
+
+const formatPrice = cents => `${cents < 0 ? '-' : ''}\$${Math.abs(cents).toString().slice(0, -2)}.${cents.toString().slice(-2)}`
+
+const computeGroup = () => {
+  const group = currentConfig.get('group')
+  const expenses = currentConfig.get('expenses')
+
+  expenses.forEach(expense => {
+    if (!group.includes(expense.name)) group.push(expense.name)
+  })
+
+  return group
+}
+
+const reset = config => {
+  config.delete('group')
+  config.delete('expenses')
+}
+
+const parsers = {
+  init: args => ({ split: args['<split>'] }),
+  group: args => ({ names: args['<name>'] }),
+  add: args => ({ name: args['<creditor>'], amount: Number(args['<amount>']), description: args['<description>'], for: args['--for'] }),
+  rm: args => ({ target: args['<target>'] }),
+  expenses: args => ({}),
+  balances: args => ({}),
+  split: args => ({}),
+  summary: args => ({}),
+  current: args => ({}),
+  list: args => ({})
+}
+
+const commands = {}
+
+commands.init = ({ split }) => {
+  if (String(Number(split)) === split) {
+    console.error('The split name can\'t be a number')
+    process.exit(1)
+  }
+
+  if (globalConfig.get('splits')[split]) {
+    globalConfig.set('current', split)
+    console.log(`Using existing split: ${split}`)
+  } else {
+    globalConfig.set('splits', Object.assign(globalConfig.get('splits'), { [split]: {} }))
+    globalConfig.set('current', split)
+    reset(new Configstore(`${pkg.name}/${split}`))
+    console.log(`Using new split: ${split}`)
+  }
+}
+
+commands.group = ({ names }) => {
+  if (!names.length) {
+    computeGroup().forEach(name => console.log(name))
+  } else {
+    currentConfig.set('group', names)
+  }
+}
+
+commands.add = ({ name, amount, description, for: for_ }) => {
+  const expenses = currentConfig.get('expenses')
+
+  const expense = {
+    name,
+    amount: amount * 100,
+    description,
+  }
+
+  if (for_.length) expense.for = for_
+
+  expenses.push(expense)
+  currentConfig.set('expenses', expenses)
+}
+
+commands.rm = ({ target }) => {
+  if (String(Number(target)) === target) {
+    const expenses = currentConfig.get('expenses')
+      .filter((expense, i) => i !== index)
+
+    currentConfig.set('expenses', expenses)
+  } else {
+    const splits = globalConfig.get('splits')
+    delete splits[target]
+    globalConfig.set('splits', splits)
+  }
+}
+
+commands.reset = () => {
+  reset(currentConfig)
+}
+
+commands.expenses = () => {
+  const expenses = currentConfig.get('expenses')
+
+  expenses.forEach((expense, i) => {
+    const forList = expense.for ? ` for ${expense.for.join(', ')}` : ''
+    console.log(`${i}  ${expense.name} paid ${formatPrice(expense.amount)} for ${expense.description}${forList}`)
+  })
+}
+
+commands.balances = () => {
+  const balances = expenseSplit.getBalances(computeGroup(), currentConfig.get('expenses'))
+
+  Object.keys(balances).forEach(name => {
+    const balance = balances[name]
+
+    if (balance > 0) console.log(`${name} owes ${formatPrice(Math.abs(balance))}`)
+    else if (balance < 0) console.log(`${name} is owed ${formatPrice(Math.abs(balance))}`)
+  })
+}
+
+commands.split = () => {
+  const transactions = expenseSplit(computeGroup(), currentConfig.get('expenses'))
+
+  transactions.forEach(transaction => {
+    console.log(`From ${transaction.from} to ${transaction.to}: ${formatPrice(transaction.amount)}`)
+  })
+}
+
+commands.summary = () => {
+  commands.expenses()
+  console.log()
+  commands.balances()
+  console.log()
+  commands.split()
+}
+
+commands.current = () => {
+  const current = globalConfig.get('current')
+
+  if (current) console.log(current)
+  else process.exit(1)
+}
+
+commands.list = () => {
+  Object.keys(globalConfig.get('splits')).forEach(split => console.log(split))
+}
+
+const command = Object.keys(commands).find(command => args[command])
+
+commands[command](parsers[command](args))

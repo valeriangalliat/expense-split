@@ -4,15 +4,17 @@
   "description": "Group expense splitting library.",
   "homepage": "https://github.com/valeriangalliat/expense-split",
   "license": "Unlicense",
+  "bin": "expense-split",
   "repository": "valeriangalliat/expense-split",
   "scripts": {
     "lint": "standard",
-    "test": "standard && node test"
+    "test": "node test"
+  },
+  "dependencies": {
+    "configstore": "^3.1.0",
+    "docopt": "^0.6.2"
   },
   "devDependencies": {
-    "standard": "^8.4.0"
-  },
-  "engines": {
-    "node": "^6.0.0"
+    "standard": "^10.0.2"
   }
 }
