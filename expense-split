@@ -32,7 +32,9 @@ const computeGroup = () => {
   const expenses = currentConfig.get('expenses')
 
   expenses.forEach(expense => {
-    if (!group.includes(expense.name)) group.push(expense.name)
+    [expense.name].concat(expense.for || []).forEach(name => {
+      if (!group.includes(name)) group.push(name)
+    })
   })
 
   return group
