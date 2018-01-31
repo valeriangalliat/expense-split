@@ -7,7 +7,7 @@
   "bin": "expense-split",
   "repository": "valeriangalliat/expense-split",
   "scripts": {
-    "lint": "standard",
+    "lint": "standard expense-split .",
     "test": "node test"
   },
   "dependencies": {
