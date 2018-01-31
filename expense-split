@@ -17,7 +17,6 @@ Usage:
 
 const Configstore = require('configstore')
 const { docopt } = require('docopt')
-const { promisify } = require('util')
 const pkg = require('./package')
 const expenseSplit = require('./')
 
@@ -25,7 +24,7 @@ const globalConfig = new Configstore(pkg.name, { splits: {} })
 const currentConfig = globalConfig.get('current') && new Configstore(`${pkg.name}/${globalConfig.get('current')}`, { group: [], expenses: [] })
 const args = docopt(doc, { version: pkg.version })
 
-const formatPrice = cents => `${cents < 0 ? '-' : ''}\$${Math.abs(cents).toString().slice(0, -2)}.${cents.toString().slice(-2)}`
+const formatPrice = cents => `${cents < 0 ? '-' : ''}$${Math.abs(cents).toString().slice(0, -2)}.${cents.toString().slice(-2)}`
 
 const computeGroup = () => {
   const group = currentConfig.get('group')
@@ -91,7 +90,7 @@ commands.add = ({ name, amount, description, for: for_ }) => {
   const expense = {
     name,
     amount: amount * 100,
-    description,
+    description
   }
 
   if (for_.length) expense.for = for_
@@ -102,7 +101,7 @@ commands.add = ({ name, amount, description, for: for_ }) => {
 
 commands.rm = ({ target }) => {
   if (String(Number(target)) === target) {
-    const index = Number(target);
+    const index = Number(target)
 
     const expenses = currentConfig.get('expenses')
       .filter((expense, i) => i !== index)
