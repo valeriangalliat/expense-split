@@ -89,7 +89,7 @@ commands.add = ({ name, amount, description, for: for_ }) => {
 
   const expense = {
     name,
-    amount: amount * 100,
+    amount: Math.round(amount * 100),
     description
   }
 
