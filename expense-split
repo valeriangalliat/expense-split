@@ -24,7 +24,8 @@ const globalConfig = new Configstore(pkg.name, { splits: {} })
 const currentConfig = globalConfig.get('current') && new Configstore(`${pkg.name}/${globalConfig.get('current')}`, { group: [], expenses: [] })
 const args = docopt(doc, { version: pkg.version })
 
-const formatPrice = cents => `${cents < 0 ? '-' : ''}$${Math.abs(cents).toString().slice(0, -2)}.${cents.toString().slice(-2)}`
+const numberFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+const formatPrice = cents => numberFormat.format(cents / 100)
 
 const computeGroup = () => {
   const group = currentConfig.get('group')
